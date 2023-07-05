@@ -1,0 +1,32 @@
+version: '3'
+
+services:
+  nginx:
+    hostname: nginx
+    build:
+      context: ./requirements/nginx
+      dockerfile: Dockerfile
+    restart: always
+    depends_on:
+      - wordpress
+    ports:
+      - 443:443
+    volumes:
+      - wordpress:/var/www/html
+    networks:
+      - inception
+  wordpress:
+  mariadb:
+  redis:
+  ftp:
+  adminer:
+  website:
+  cadvisor:
+
+volumes:
+  mariadb:
+  wordpress:
+
+networks:
+  inception:
+    driver: bridge
