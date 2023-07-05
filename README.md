@@ -1,2 +1,10 @@
 # inception
-One container is not enough, we need to go deeper.
+- Services :
+  - nginx
+  - wordpress
+  - mariadb
+  - redis
+  - ftp
+  - adminer
+  - website
+  - cadvisor
