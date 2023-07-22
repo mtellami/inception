@@ -1,8 +1,5 @@
 #!/bin/bash
 
-FTP_USER=mtellami
-FTP_PASSWORD=password
-
 cp /tmp/vsftpd.conf /etc/vsftpd.conf && \
 
 adduser --disabled-password --gecos "" $FTP_USER && \
