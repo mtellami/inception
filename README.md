@@ -44,22 +44,79 @@ Additionally, using Nginx as the web server for your WordPress site can signific
 Overall, the combination of Nginx running on a Docker container, serving the WordPress site hosted in another container with a shared volume, and listening on port 443 for HTTPS connections, creates a secure, scalable, and performant environment for hosting your WordPress website. This setup simplifies deployment, enhances data consistency, and ensures that your users can access your site securely and with optimal performance.
 
 ## Implementation - Technical Part
-- Docker-compose
+### - Docker-compose <br>
 Docker Compose is a tool that was developed to help define and share multi-container applications. With Compose, we can create a YAML file to define the services and with a single command, can spin everything up or tear it all down.
-I use docker compose to the three containers with the appropriate order, ports, shared volumes, networks. it help run, stop and restart the containers smoothly
+I use docker compose to the three containers with the appropriate order, ports, shared volumes, networks. it help run, stop and restart the containers smoothly.
 
-- Dotenv file
+```yml
+  services:
+  nginx:
+    container_name: nginx;
+    build:
+      context: ./requirements/nginx
+      dockerfile: Dockerfile
+    depends_on:
+      - wordpress
+    volumes:
+      - wordpress:/var/www/wordpress
+    ports:
+      - "443:443"
+    networks:
+      - inception
+    env_file:
+      - .env
+  wordpress:
+    container_name: wordpress
+    build:
+      context: ./requirements/wordpress
+      dockerfile: Dockerfile
+    depends_on:
+      - mariadb
+    volumes:
+      - wordpress:/var/www/wordpress
+    networks:
+      - inception
+    ports:
+       - "9000:9000"
+    env_file:
+      - .env
+  mariadb:
+    container_name: mariadb
+    build:
+      context: ./requirements/mariadb
+      dockerfile: Dockerfile
+    volumes:
+      - mariadb:/var/lib/mysql
+    networks:
+      - inception
+    ports:
+      - "3306:3306"
+    env_file:
+      - .env
+```
+
+### - Dotenv file
 a dotenv is used to store “environment variables” AKA variables we need to configure our code environment. This can include information like database name, users, passwords, open ports. These variables are ones we need in order to access our project’s various services but don’t want others to be able to see and access. An example of this would include API keys ...etc
 
-- container image
+### - container image
 A Docker image is a file used to execute code in a Docker container. Docker images act as a set of instructions to build a Docker container, like a template. Docker images also act as the starting point when using Docker. An image is comparable to a snapshot in virtual machine (VM) environments.
 
-- Dockerfile
+### - Dockerfile
 The three images are build with Dockerfile based on Debian:buster image, Dockerfile allow me to build my custom image based on another base image, in this case 'debian:buster' (FROM) and install all the dependencies nedded to run the container (RUN ..), Also i can set the default executable of the image (CMD). and specify the litening port for the container on the network.
 
-- Docker container
-- Docker network
-- Docker volume
+```dockerfile
+  FROM [Base image]
+  COPY [configurations]
+  RUN [Dependencies ...]
+  EXPOSE [Port]
+  CMD [run command]
+```
+
+### - Docker container
+### - Docker network
+### - Docker volume
+
+<img src="https://logos-world.net/wp-content/uploads/2021/02/Docker-Logo-2015-2017.png">
 
 ## Conclution
 The use of three separate containers, each dedicated to specific components (MariaDB, WordPress, and Nginx), represents an efficient and well-designed approach for creating a high-performance website while adhering to best practices. By isolating each part into individual containers, this setup ensures that every component operates independently, minimizing potential conflicts and improving overall system stability.
@@ -70,9 +127,19 @@ The WordPress container houses the web application, managing content creation, u
 
 The use of three separate containers, each dedicated to specific components (MariaDB, WordPress, and Nginx), represents an efficient and well-designed approach for creating a high-performance website while adhering to best practices. By isolating each part into individual containers, this setup ensures that every component operates independently, minimizing potential conflicts and improving overall system stability.
 
+<hr>
+
+<img src="https://mariadb.com/wp-content/uploads/2019/11/mariadb-horizontal-white.svg">
+
 Starting with the MariaDB container, it serves as the database management system, providing robust and reliable data storage for the website. Its isolation allows for easy management and scaling, and data remains persistent even if the container is replaced or updated, thanks to the use of Docker volumes.
 
+<hr>
+
+<img src="https://brandslogos.com/wp-content/uploads/images/large/wordpress-logo.png">
+
 The WordPress container houses the web application, managing content creation, user interactions, and dynamic functionalities. Running WordPress in a separate container guarantees a clean separation from other services, making it easier to maintain, update, and replace without affecting the rest of the setup. 
+
+<img src="https://www.nginx.com/wp-content/uploads/2018/08/NGINX-logo-rgb-large.png">
 
 Managing this setup with Docker containers, networks, and volumes offers several advantages. Docker enables the encapsulation of each component, ensuring consistent and reproducible deployments across different environments. Its containerization allows for easy scaling, load balancing, and failover, ensuring the website can handle increased traffic without compromising performance. Docker networks facilitate seamless communication between containers, and by exposing only necessary ports, the attack surface is minimized, enhancing security.
 
